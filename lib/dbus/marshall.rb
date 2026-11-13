@@ -327,10 +327,36 @@ module DBus
         # Damn ruby rocks here
         val = val.to_a
       end
-      # If string is received and ay is expected, explode the string
-      if val.is_a?(String) && child_type.sigtype == Type::BYTE
-        val = val.bytes
+
+      # Fast path for byte arrays (ay): append raw bytes without per-element marshalling.
+      if child_type.sigtype == Type::BYTE
+        val = val.exact_value if defined?(Data::Array) && val.is_a?(Data::Array)
+        bytes =
+          case val
+          when String
+            val.b
+          when Array
+            begin
+              val.pack("C*")
+            rescue TypeError, ArgumentError
+              val.map { |elem| elem.is_a?(Integer) ? elem : elem.value }.pack("C*")
+            end
+          else
+            unless val.is_a?(Enumerable)
+              raise TypeException, "Expected an Enumerable of #{child_type.inspect} but got a #{val.class}"
+            end
+
+            begin
+              val.to_a.pack("C*")
+            rescue TypeError, ArgumentError
+              val.map { |elem| elem.is_a?(Integer) ? elem : elem.value }.pack("C*")
+            end
+          end
+
+        array(child_type) { @packet << bytes }
+        return
       end
+
       if !val.is_a?(Enumerable)
         raise TypeException, "Expected an Enumerable of #{child_type.inspect} but got a #{val.class}"
       end
