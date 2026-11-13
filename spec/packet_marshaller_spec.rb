@@ -38,4 +38,12 @@ describe DBus::PacketMarshaller do
       end
     end
   end
+
+  context "byte arrays (ay)" do
+    it "writes a byte array containing DBus::Data::Byte elements" do
+      subject = described_class.new(endianness: :little)
+      subject.append("ay", [DBus::Data::Byte.new(97), DBus::Data::Byte.new(0), DBus::Data::Byte.new(98)])
+      expect(subject.packet).to eq([3, 0, 0, 0, 97, 0, 98].pack("C*"))
+    end
+  end
 end

@@ -1359,6 +1359,55 @@
   - 0
   exc: DBus::IncompleteBufferException
   msg: ''
+# String inputs for ay (bytes sent according to string encoding)
+- sig: ay
+  end: little
+  buf:
+  - 0
+  - 0
+  - 0
+  - 0
+  val: ""
+- sig: ay
+  end: little
+  buf:
+  - 2
+  - 0
+  - 0
+  - 0
+  - 97
+  - 98
+  val: "ab"
+- sig: ay
+  end: little
+  buf:
+  - 2
+  - 0
+  - 0
+  - 0
+  - 197
+  - 152
+  val: "ř"
+- sig: ay
+  end: big
+  buf:
+  - 0
+  - 0
+  - 0
+  - 2
+  - 97
+  - 98
+  val: "ab"
+- sig: ay
+  end: big
+  buf:
+  - 0
+  - 0
+  - 0
+  - 2
+  - 197
+  - 152
+  val: "ř"
 - sig: at
   end: little
   buf:
